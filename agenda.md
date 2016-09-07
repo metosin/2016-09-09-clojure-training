@@ -18,8 +18,13 @@ Basic idea of Clojure build tools is to manage the classpath.
 
 ### Boot
 
+- DISCLAIMER: Windows 10 support maybe - probably many tasks broken, including tasks written by me
+    - You are welcome to help if you use Windows, the problem are just a few badly coded path manipulations
+    - I have already setup Windows CI but fixes are still on my todo list...
+
 - Pods - separate classpaths inside single JVM
 - Fileset
+    - Introduces some additional overhead - so Boot will be slightly slower
 - DEMO: Run code with two different Clojure versions in one session
 - HANDS ON: Create a Boot task
     - IDEA 1: Create a Clojure namespace which defines a var with current git sha
