@@ -56,11 +56,12 @@
               (recur)))))
       (assoc this :socket socket)))
   (stop [this]
-    (if (:socket this)
-      ((:chsk-disconnect (:socket this))))
-    (assoc this :socket nil)))
+    this))
 
 (defn new-system [opts]
   (component/system-map
     :sente (map->Sente {})
     :http-kit (component/using (map->HttpKit opts) [:sente])))
+
+;; FIXME: c.t.n + boot-cljs + some cljc libraries have current problems when ns with protocol defs are reloaded
+(doall (map #(clojure.tools.namespace.repl/disable-reload! (find-ns %)) '[taoensso.sente.interfaces]))
