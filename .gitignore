@@ -1,11 +1,11 @@
 /target
-/lein-target
+lein-target
 /classes
 pom.xml
 pom.xml.asc
 *.jar
 *.class
-/.nrepl-port
+.nrepl-port
 /resources/public/js
 /out
 /.repl

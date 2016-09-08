@@ -4,7 +4,7 @@
   :resource-paths ^:replace []
   :test-paths ["test/clj"]
   :target-path "lein-target"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha10"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.229"]
 
                  [http-kit "2.2.0"]
@@ -18,6 +18,7 @@
                  [hiccup "1.0.5"]
 
                  [reagent "0.6.0-20160714.075816-3"]
+                 [example-component "0.1.0-SNAPSHOT"]
                  [binaryage/devtools "0.8.1"]]
   :main backend.daemon
   :repl-options {:init-ns user}

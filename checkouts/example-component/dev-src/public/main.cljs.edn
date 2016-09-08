@@ -1,0 +1,7 @@
+{:require [example.main]
+ :compiler-options {:asset-path "main.out"
+                    :parallel-build true
+                    :preloads [devtools.preload]
+                    :external-config {:devtools/config {:features-to-install [:formatters :hints]}}
+                    :devcards true}}
+

@@ -1,15 +1,23 @@
 # Metosin Clojure Training 2016-09-09
 
+This projects consists of two parts.
+
+- Main project
+- [Children project for separate library](./checkouts/example-component/README.md), to
+demonstrate usage of Boot and Lein checkouts feature.
+
 ## Start the app for development
 
 ### Boot
 
+- All: Install the child project to local Maven repo: `cd checkouts/example-component-lib; boot build`
 - Cursive: `boot dev` and connect to remote repl
 - Fireplace: `boot dev` and connect to remote repl
 - Cider: `boot dev` and `M-x cider-connect`
 
 ### Lein
 
+- All: Install the child project to local Maven repo: `cd checkouts/example-component-lib; lein install`
 - `lein less4j auto`
 - `lein figwheel`
 - Cursive: Start repl from cursive or `lein repl` and connect to remote repl

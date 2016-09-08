@@ -5,7 +5,7 @@
   :source-paths #{"src/cljs" "src/less" "test/clj" "test/cljs"}
   ; Resource-paths are included in the JAR
   :resource-paths #{"src/clj" "src/cljc"}
-  :dependencies '[[org.clojure/clojure    "1.9.0-alpha12"]
+  :dependencies '[[org.clojure/clojure    "1.8.0"]
                   [org.clojure/clojurescript "1.9.229"]
 
                   [boot/core              "2.6.0"      :scope "test"]
@@ -34,7 +34,9 @@
                   ; Frontend
                   ;; Latest snapshot fixes some important issues - use the specific version
                   [reagent "0.6.0-20160714.075816-3"]
-                  [binaryage/devtools "0.8.1"]])
+                  [example-component "0.1.0-SNAPSHOT"]
+                  [binaryage/devtools "0.8.1"]]
+  :checkouts '[[example-component "0.1.0-SNAPSHOT"]])
 
 (require
   '[adzerk.boot-cljs      :refer [cljs]]

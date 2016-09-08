@@ -1,5 +1,5 @@
-{:compiler-options {:main "frontend.main"
-                    :asset-path "js/main.out"
+{:require [frontend.main]
+ :compiler-options {:asset-path "js/main.out"
                     :parallel-build true
                     :preloads [devtools.preload]
                     :external-config {:devtools/config {:features-to-install [:formatters :hints]}}}}
