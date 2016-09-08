@@ -1,6 +1,6 @@
 (ns frontend.main
   (:require [reagent.core :as r]
-            [example-component.core :refer [example]]))
+            [example-component.core :refer [autocomplete]]))
 
 ;; Based on https://github.com/holmsand/reagent/blob/master/examples/todomvc/src/todomvc/core.cljs
 
@@ -34,19 +34,20 @@
         save #(let [v (-> @val str clojure.string/trim)]
                 (if-not (empty? v) (on-save v))
                 (stop))]
-    (r/create-class
-      {:component-did-mount #(if focus-on-mount (.focus (r/dom-node %)))
-       :reagent-render
-       (fn [props]
-         [:input
-          (-> props
-              (dissoc :title :on-stop :on-save :focus-on-mount)
-              (merge {:type "text" :value @val :on-blur save
-                      :on-change #(reset! val (-> % .-target .-value))
-                      :on-key-down #(case (.-which %)
-                                      13 (save) ;; Enter
-                                      27 (stop) ;; Esc
-                                      nil)}))])})))
+    (fn [{:keys [title on-save on-stop focus-on-mount] :as props}]
+      [autocomplete
+       (-> props
+           (dissoc :title :on-stop :on-save :focus-on-mount)
+           (merge {:type "text"
+                   :value @val
+                   :on-blur save
+                   :auto-focus focus-on-mount
+                   :container-class "todo-input__container"
+                   :on-change #(reset! val (-> % .-target .-value))
+                   :on-key-down #(case (.-which %)
+                                   13 (save) ;; Enter
+                                   27 (stop) ;; Esc
+                                   nil)}))])))
 
 (defn todo-item []
   (let [editing (r/atom false)]
