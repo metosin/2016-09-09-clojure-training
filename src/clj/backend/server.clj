@@ -1,34 +1,66 @@
 (ns backend.server
   (:require [com.stuartsierra.component :as component]
-            [compojure.core :refer [GET defroutes]]
+            [compojure.core :refer [GET POST routes]]
             [compojure.route :refer [resources]]
             [ring.util.http-response :refer :all]
+            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+            [ring.middleware.params :refer [wrap-params]]
             [org.httpkit.server :refer [run-server]]
-            [backend.index :refer [index-page test-page]]))
+            [clojure.core.async :as async]
+            [backend.index :refer [index-page test-page]]
+            [taoensso.sente :as sente]
+            [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]))
 
-(defroutes routes
-  (resources "/" {:root "public"})
+(defonce todos (atom (sorted-map)))
 
-  (GET "/" []
-    (-> (ok index-page) (content-type "text/html")))
-  (GET "/test" []
-    (-> (ok test-page) (content-type "text/html"))))
+(defn create-routes [sente]
+  (let [{:keys [ajax-post-fn ajax-get-or-ws-handshake-fn]} sente]
+    (-> (routes
+          (resources "/" {:root "public"})
+
+          (GET "/chsk" req (ajax-get-or-ws-handshake-fn req))
+          (POST "/chsk" req (ajax-post-fn req))
+
+          (GET "/" []
+            (-> (ok index-page) (content-type "text/html")))
+          (GET "/test" []
+            (-> (ok test-page) (content-type "text/html"))))
+
+        wrap-keyword-params
+        wrap-params)))
 
 ;; Component to handle start/stop/reset
 ;; Alternatives: Mount, DIY...
 
-(defrecord HttpKit [port]
+(defrecord HttpKit [port sente]
   component/Lifecycle
   (start [this]
     (let [port (or port 9000)]
       (println (str "Starting web server on http://localhost:" port))
-      (assoc this :http-kit (run-server #'backend.server/routes
+      (assoc this :http-kit (run-server (create-routes (:socket sente))
                                         {:port port :join? false}))))
   (stop [this]
     (if-let [http-kit (:http-kit this)]
       (http-kit))
     (assoc this :http-kit nil)))
 
+(defrecord Sente [socket]
+  component/Lifecycle
+  (start [this]
+    (let [{:keys [ch-recv] :as socket} (sente/make-channel-socket! (get-sch-adapter) {})]
+      (async/go
+        (loop []
+          (let [v (async/<! ch-recv)]
+            (when v
+              (println v)
+              (recur)))))
+      (assoc this :socket socket)))
+  (stop [this]
+    (if (:socket this)
+      ((:chsk-disconnect (:socket this))))
+    (assoc this :socket nil)))
+
 (defn new-system [opts]
   (component/system-map
-    :http-kit (map->HttpKit opts)))
+    :sente (map->Sente {})
+    :http-kit (component/using (map->HttpKit opts) [:sente])))

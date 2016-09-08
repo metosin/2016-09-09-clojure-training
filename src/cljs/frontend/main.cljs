@@ -1,5 +1,8 @@
 (ns frontend.main
+  (:require-macros [cljs.core.async.macros :as asyncm])
   (:require [reagent.core :as r]
+            [cljs.core.async :as async]
+            [taoensso.sente :as sente]
             [example-component.core :refer [autocomplete]]))
 
 ;; Based on https://github.com/holmsand/reagent/blob/master/examples/todomvc/src/todomvc/core.cljs
@@ -105,6 +108,8 @@
             "Clear completed " done])
 
          ]))))
+
+(defonce socket (sente/make-channel-socket! "/chsk" {:type :auto}))
 
 (defn start! []
   (js/console.log "Starting the app")
