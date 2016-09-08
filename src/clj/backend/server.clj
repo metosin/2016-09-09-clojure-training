@@ -3,10 +3,7 @@
             [com.stuartsierra.component :as component]
             [compojure.core :refer [GET defroutes]]
             [compojure.route :refer [resources]]
-            [compojure.handler :refer [api]]
-            [ring.util.response :refer [redirect]]
             [ring.util.http-response :refer :all]
-            [ring.middleware.reload :refer [wrap-reload]]
             [org.httpkit.server :refer [run-server]]
             [backend.index :refer [index-page test-page]]))
 
@@ -14,12 +11,14 @@
   (resources "/" {:root "public"})
 
   (GET "/" []
-    ; Use (resource-response "index.html") to serve index.html from classpath
     (-> (ok index-page) (content-type "text/html")))
   (GET "/test" []
     (-> (ok test-page) (content-type "text/html"))))
 
-(defrecord HttpKit [port reload reload-dirs]
+;; Component to handle start/stop/reset
+;; Alternatives: Mount, DIY...
+
+(defrecord HttpKit [port]
   component/Lifecycle
   (start [this]
     (let [port (or port 9000)]

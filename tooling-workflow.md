@@ -43,6 +43,15 @@ Basic idea of Clojure build tools is to manage the classpath.
 - Provides most of the same feature as Figwheel
 - Three separate tasks: boot-cljs, boot-reload and boot-cljs-repl
 
+### Alternatives
+
+- Don't want Boot but Lein has too many processes - Fix it yourself:
+- Use Figwheel library from `lein repl` (or boot): https://github.com/bhauman/lein-figwheel#scripting-figwheel
+    - One JVM process less, has side-effects!
+- Similarly you could run Less4clj without Lein plugin
+- https://github.com/clojure/clojurescript/wiki/Quick-Start#auto-building
+- https://github.com/clojure/clojurescript/blob/master/src/main/clojure/cljs/build/api.clj
+
 ## Workflow
 
 ### Clojure
@@ -64,10 +73,10 @@ Basic idea of Clojure build tools is to manage the classpath.
 
 ### Cljs
 
-- "David's workflow, maybe" Cljs.jar + bash build script + manual reload
-- (emacs) Inferior lisp mode repl
-- Browser repl (Nrepl + Websocket)
 - Live reloads (Figwheel, Boot-reload)
+- Browser repl (Nrepl + Websocket)
+- (emacs) Inferior lisp mode repl
+- "David's workflow, maybe" Cljs.jar + bash build script + manual reload
 
 ### Testing
 
@@ -100,21 +109,13 @@ Basic idea of Clojure build tools is to manage the classpath.
     - Easy with Boot: `boot watch pom jar install` (install a jar to local maven repo after everychange)
     - Slow with Lein
 
-## Initializing a project
-
-- ASK: How do you do currently?
-- Templates
-- Example projects?
-- Use the previous project?
-- Future: Arachne?
-
 ## Deploying a project
 
 - Uberjar?
-- Can be very large - 50-100M
-- Can be slow to deploy to server (shouldn't be problem if you run CI and CI has fast connection to server)
-- We haven't yet solved this - not a huge problem but can be annonying
-- There are couple of offender packages - like ring-middleware-format which requires ibm/icu4j
+- Can get quite big if lots of dependencies
+- There are couple of large offender packages - like ring-middleware-format which requires ibm/icu4j
+- Make sure development deps are not included: Cljs compiler & Cljs libs
+    - Use Maven scope with Boot and Lein profiles
 - *Solution 1*: Don't use the largest offending packages - use alternatives or fix them
 - *Solution 2*: Only send changed files as not all deps inside uberjar change everytime
     - Unpack JAR (Zip) and send contents over Rsync - Repackage on target

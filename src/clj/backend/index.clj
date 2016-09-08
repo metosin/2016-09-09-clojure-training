@@ -6,7 +6,7 @@
   (html
     (html5
       [:head
-       [:title "Saapas"]
+       [:title "Training"]
        [:meta {:charset "utf-8"}]
        [:meta {:http-equiv "X-UA-Compatible" :content "IE=edge"}]
        [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
@@ -19,7 +19,7 @@
   (html
     (html5
       [:head
-       [:title "Saapas tests"]]
+       [:title "Training tests"]]
       [:body
        [:div.container [:div#app.app-wrapper]]
        (include-js "js/test.js")])))

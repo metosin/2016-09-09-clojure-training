@@ -8,6 +8,9 @@ This is not the truth. These are some things we have learned and use.
 - We have found no reason to include package name in namespaces
     - `project-a.backend.main` vs. `backend.main`
     - Applications won't be included in classpath of other apps -> no clashes
+- Initializing project: copy the previous project...
+    - Works surprisingly good
+    - Alternatives: Template, separate example project
 - Names are the same between two projects
     - New project -> Copy old one and keep many of basic namespaces
     - Easy to diff files between projects
@@ -24,9 +27,9 @@ This is not the truth. These are some things we have learned and use.
 - HTTP vs. WebSocket
 - HANDS ON: Sente example - connect existing backend app and frontend
 
-- "Focusing on the essence" - hide the transfer mechanic
+- "Focusing on the essence" - hide the transfer mechanic?
     - Same dispatch mechanism on back and front
-    - Example from this?
+    - multimethod
 
 ## Designing reusable components
 
