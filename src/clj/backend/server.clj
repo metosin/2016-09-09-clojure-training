@@ -9,9 +9,35 @@
             [clojure.core.async :as async]
             [backend.index :refer [index-page test-page]]
             [taoensso.sente :as sente]
+            [taoensso.sente.packers.transit :as sente-transit]
             [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]))
 
 (defonce todos (atom (sorted-map)))
+
+(defmulti event-msg-handler :id) ; Dispatch on event-id
+;; Wrap for logging, catching, etc.:
+(defn event-msg-handler* [{:as ev-msg :keys [id ?data event]}]
+  (println "Event:" event)
+  (event-msg-handler ev-msg))
+
+(defmethod event-msg-handler :default ; Fallback
+  [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
+  (let [session (:session ring-req)
+        uid     (:uid     session)]
+    (println "Unhandled event:" event)
+    (when ?reply-fn
+      (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
+
+(defmethod event-msg-handler :todos/add
+  [{:keys [?data send-fn ?reply-fn connected-uids]}]
+  (let [id (str (java.util.UUID/randomUUID))
+        data (assoc ?data :id id)]
+    ;; Broadcast
+    (doseq [uid (:any @connected-uids)]
+      (send-fn uid [:todos/added data]))
+    (when ?reply-fn
+      (?reply-fn [:todos/added data]))
+    (swap! todos assoc id data)))
 
 (defn create-routes [sente]
   (let [{:keys [ajax-post-fn ajax-get-or-ws-handshake-fn]} sente]
@@ -47,15 +73,12 @@
 (defrecord Sente [socket]
   component/Lifecycle
   (start [this]
-    (let [{:keys [ch-recv] :as socket} (sente/make-channel-socket! (get-sch-adapter) {})]
-      (async/go
-        (loop []
-          (let [v (async/<! ch-recv)]
-            (when v
-              (println v)
-              (recur)))))
-      (assoc this :socket socket)))
+    (let [packer (sente-transit/get-transit-packer)
+          {:keys [ch-recv] :as socket} (sente/make-channel-socket! (get-sch-adapter) {:packer packer})
+          router (sente/start-chsk-router! ch-recv event-msg-handler*)]
+      (assoc this :socket socket :router router)))
   (stop [this]
+    (when-let [r (:router this)] (r))
     this))
 
 (defn new-system [opts]
