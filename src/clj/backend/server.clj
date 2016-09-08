@@ -11,8 +11,7 @@
             [backend.index :refer [index-page test-page]]))
 
 (defroutes routes
-  (resources "/js" {:root "js"})
-  (resources "/css" {:root "css"})
+  (resources "/" {:root "public"})
 
   (GET "/" []
     ; Use (resource-response "index.html") to serve index.html from classpath
@@ -23,7 +22,7 @@
 (defrecord HttpKit [port reload reload-dirs]
   component/Lifecycle
   (start [this]
-    (let [port (or port 10555)]
+    (let [port (or port 9000)]
       (println (str "Starting web server on http://localhost:" port))
       (assoc this :http-kit (run-server #'backend.server/routes
                                         {:port port :join? false}))))

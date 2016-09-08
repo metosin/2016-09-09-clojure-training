@@ -5,7 +5,7 @@
   :source-paths #{"src/cljs" "src/less" "test/clj" "test/cljs"}
   ; Resource-paths are included in the JAR
   :resource-paths #{"src/clj" "src/cljc"}
-  :dependencies '[[org.clojure/clojure    "1.9.0-alpha11"]
+  :dependencies '[[org.clojure/clojure    "1.9.0-alpha12"]
                   [org.clojure/clojurescript "1.9.229"]
 
                   [boot/core              "2.6.0"      :scope "test"]
@@ -21,10 +21,10 @@
                   ;; For boot-less
                   [org.slf4j/slf4j-nop    "1.7.21"     :scope "test"]
 
-                  ; Backend
                   [http-kit "2.2.0"]
+                  [com.taoensso/sente "1.10.0"]
                   [org.clojure/tools.namespace "0.3.0-alpha3"]
-                  [reloaded.repl "0.2.2"]
+                  [reloaded.repl "0.2.3"]
                   [com.stuartsierra/component "0.3.1"]
                   [metosin/ring-http-response "0.8.0"]
                   [ring "1.5.0"]
@@ -32,7 +32,8 @@
                   [hiccup "1.0.5"]
 
                   ; Frontend
-                  [reagent "0.6.0-SNAPSHOT"]
+                  ;; Latest snapshot fixes some important issues - use the specific version
+                  [reagent "0.6.0-20160714.075816-3"]
                   [binaryage/devtools "0.8.1"]])
 
 (require
@@ -46,10 +47,9 @@
   '[reloaded.repl         :refer [go reset start stop system]])
 
 (task-options!
-  pom {:project 'saapas
+  pom {:project 'training
        :version "0.1.0-SNAPSHOT"
-       :description "Application template for Cljs/Om with live reloading, using Boot."
-       :license {"The MIT License (MIT)" "http://opensource.org/licenses/mit-license.php"}}
+       :description "Foo bar"}
   aot {:namespace #{'backend.main}}
   jar {:main 'backend.main}
   cljs {:source-map true}
@@ -57,15 +57,15 @@
 
 (deftask dev
   "Start the dev env..."
-  [p port       PORT int  "Port for web server"]
+  []
   (comp
     (watch)
     (less)
-    (reload :ids #{"js/main"})
-    ; This starts a repl server with piggieback middleware
-    (cljs-repl :ids #{"js/main"})
-    (cljs :ids #{"js/main"})
-    (start-app :port port)))
+    (reload)
+    ; This starts a nrepl server with piggieback middleware
+    (cljs-repl)
+    (cljs)
+    (start-app)))
 
 (deftask run-tests
   [a autotest bool "If no exception should be thrown when tests fail"]
@@ -84,9 +84,11 @@
   []
   (comp
     (less :compression true)
-    (cljs :optimizations :advanced)
+    (cljs :optimizations :advanced
+          :compiler-options {:preloads []})
     (aot)
     (pom)
     (uber)
     (jar)
-    (target)))
+    (sift :include #{#"^[^/\\]*\.jar$"})
+    (target :dir "boot-target")))

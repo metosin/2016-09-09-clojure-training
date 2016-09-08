@@ -1,6 +1,6 @@
 /target
+/lein-target
 /classes
-/checkouts
 pom.xml
 pom.xml.asc
 *.jar
@@ -12,3 +12,5 @@ pom.xml.asc
 .nrepl-history
 /.boot
 .cljs_rhino_repl
+.lein-repl-history
+figwheel_server.log

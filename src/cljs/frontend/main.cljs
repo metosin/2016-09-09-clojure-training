@@ -1,4 +1,4 @@
-(ns frontend.core
+(ns frontend.main
   (:require-macros [frontend.macro :refer [foobar]])
   (:require [reagent.core :as r]
             [common.hello :refer [foo-cljc]]))

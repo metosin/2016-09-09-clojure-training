@@ -1,7 +1,6 @@
 (ns backend.index
-  (:require
-    [hiccup.core :refer [html]]
-    [hiccup.page :refer [html5 include-js include-css]]))
+  (:require [hiccup.core :refer [html]]
+            [hiccup.page :refer [html5 include-js include-css]]))
 
 (def index-page
   (html
