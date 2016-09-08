@@ -14,3 +14,4 @@ pom.xml.asc
 .cljs_rhino_repl
 .lein-repl-history
 figwheel_server.log
+app-*.zip

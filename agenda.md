@@ -1,9 +1,9 @@
-- Single example project for both of these topics.
-- TODO APP!
-- Existing backend and partial frontend
-- Both Lein and Boot setup.
+# Tooling & workflow for Clj and Cljs
 
-# Tooling & workflow for Clj and Cljs (1.5h)
+- Single example project for both of these topics.
+- Todo mvc!
+- Existing backend and frontend
+- Both Lein and Boot setup.
 
 ## Tooling
 
@@ -27,8 +27,7 @@ Basic idea of Clojure build tools is to manage the classpath.
     - Introduces some additional overhead - so Boot will be slightly slower
 - DEMO: Run code with two different Clojure versions in one session
 - HANDS ON: Create a Boot task
-    - IDEA 1: Create a Clojure namespace which defines a var with current git sha
-        - Doesn't read any input files -> not the best example
+    - Implement zip task which packages some files
 
 ## Cljs build tooling
 
@@ -57,7 +56,6 @@ Basic idea of Clojure build tools is to manage the classpath.
 - remote nrepl - to prod!!
 
 - Debugging: CURSIVE!
-    - DEMO: ClojureScript compiler add breakpoint (http://dev.clojure.org/jira/browse/CLJS-1762)
 
 - Profiling
     - Java VisualVM: Can be SLOW if the classpath has nrepl + middlewares (cider-nrepl)
@@ -117,57 +115,11 @@ Basic idea of Clojure build tools is to manage the classpath.
 - Can be slow to deploy to server (shouldn't be problem if you run CI and CI has fast connection to server)
 - We haven't yet solved this - not a huge problem but can be annonying
 - There are couple of offender packages - like ring-middleware-format which requires ibm/icu4j
-- Solution 1: Don't use the largest offending packages - use alternatives or fix them
-- Solution 2: Only send changed files as not all deps inside uberjar change everytime
+- *Solution 1*: Don't use the largest offending packages - use alternatives or fix them
+- *Solution 2*: Only send changed files as not all deps inside uberjar change everytime
     - Unpack JAR (Zip) and send contents over Rsync - Repackage on target
     - Rsync can take of deleted files etc.
-- Docker? Not in use yet
+- Docker? I have not used yet
     - Unpack JAR and separate app code and libraries in different layers
-
-
-
-
-
-# Architecture considerations of full-stack Clojure apps (2h)
-
-This is not the truth. These are some things we have learned and use.
-
-## Application namespace hierachy
-
-- `common`, `backend`, `frontend`
-- We have found no reason to include package name in namespaces
-    - `project-a.backend.main` vs. `backend.main`
-    - Applications won't be included in classpath of other apps -> no clashes
-- Names are the same between two projects
-    - New project -> Copy old one and keep many of basic namespaces
-    - Easy to diff files between projects
-    - General namespaces are moved to company wide common lib: https://github.com/metosin/metosin-common/
-    - Later, move the best parts to separate libs
-    - But there are cases where namespaces are still included in projects
-    - Lazyness, bad design, practicality
-
-## Communications
-
-- JSON
-- EDN
-- Transit
-- HTTP vs. WebSocket
-- HANDS ON: Sente example - connect existing backend app and frontend
-
-- "Focusing on the essence" - hide the transfer mechanic
-    - Same dispatch mecanism on back and front
-    - Example from this?
-
-## Designing reusable components
-
-- We use Reagent, but these same ideas hold for Om, Rum etc.
-- Pass only PURE DATA to the components!
-- No atoms, instead value & on-change callback etc.
-- Parametrize class of every element?
-- HANDS ON: Reagent, build x component
-
-# Random ideas worth mentioning
-
-- Performant Cljs code: https://github.com/funcool/bide write critical parts in JS
 
 []: vim: set nospell :

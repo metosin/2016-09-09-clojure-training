@@ -15,4 +15,4 @@
 
 (defn -main [& args]
   (reloaded.repl/set-init! init)
-  (reloaded.repl/start))
+  (reloaded.repl/go))

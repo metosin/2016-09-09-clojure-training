@@ -6,7 +6,7 @@
   ; Resource-paths are included in the JAR
   :resource-paths #{"src/clj" "src/cljc"}
   :dependencies '[[org.clojure/clojure    "1.8.0"]
-                  [org.clojure/clojurescript "1.9.229"]
+                  [org.clojure/clojurescript "1.9.229" :scope "provided"]
 
                   [boot/core              "2.6.0"      :scope "test"]
                   [adzerk/boot-cljs       "1.7.228-1"  :scope "test"]
@@ -27,15 +27,15 @@
                   [reloaded.repl "0.2.3"]
                   [com.stuartsierra/component "0.3.1"]
                   [metosin/ring-http-response "0.8.0"]
-                  [ring "1.5.0"]
+                  [ring/ring-core "1.5.0"]
                   [compojure "1.5.1"]
                   [hiccup "1.0.5"]
 
                   ; Frontend
                   ;; Latest snapshot fixes some important issues - use the specific version
-                  [reagent "0.6.0-20160714.075816-3"]
-                  [example-component "0.1.0-SNAPSHOT"]
-                  [binaryage/devtools "0.8.1"]]
+                  [reagent "0.6.0-20160714.075816-3" :scope "provided"]
+                  [example-component "0.1.0-SNAPSHOT" :scope "provided"]
+                  [binaryage/devtools "0.8.1" :scope "provided"]]
   :checkouts '[[example-component "0.1.0-SNAPSHOT"]])
 
 (require
@@ -52,7 +52,8 @@
   pom {:project 'training
        :version "0.1.0-SNAPSHOT"
        :description "Foo bar"}
-  aot {:namespace #{'backend.main}}
+  ;; Component is used by the aot compiled main
+  aot {:namespace #{'backend.main 'com.stuartsierra.component 'com.stuartsierra.dependency}}
   jar {:main 'backend.main}
   cljs {:source-map true}
   less {:source-map true})
@@ -81,6 +82,14 @@
     (watch)
     (run-tests :autotest true)))
 
+(deftask docker-zip
+  [i include INCLUDE edn "Regex to select files in the fileset to package"
+   l local-files LOCAL #{str} "Local files to add to the zip"
+   o output OUTPUT str "Name for output file"]
+  ;; https://github.com/boot-clj/boot/wiki/Tasks#task-anatomy
+  ;; FIXME: implement
+  identity)
+
 (deftask package
   "Build the package"
   []
@@ -90,7 +99,16 @@
           :compiler-options {:preloads []})
     (aot)
     (pom)
-    (uber)
-    (jar)
-    (sift :include #{#"^[^/\\]*\.jar$"})
-    (target :dir "boot-target")))
+    ;; Do not included provided deps in the uberjar - slimmer jar
+    (uber :exclude-scope #{"provided"})
+    (jar :file "app.jar")
+    (sift :include #{#"app\.jar$"})
+    ;; Package dockerfile and jar for Amazon Beanstalk.
+    ;; docker-zip.sh does the same
+    (docker-zip :include #{#"app\.jar"} ;; from fileset
+                :local-files #{"Dockerfile"}
+                :output "app.zip"
+                ;; Extra
+                ;; :output "app-%1$s.zip" where %1$s is replaced with a timestamp
+                )
+    (target :dir #{"target"})))
