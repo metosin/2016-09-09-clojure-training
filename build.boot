@@ -91,7 +91,22 @@
    o output OUTPUT str "Name for output file"]
   ;; https://github.com/boot-clj/boot/wiki/Tasks#task-anatomy
   ;; FIXME: implement
-  identity)
+  (let [tmp-out (boot.core/tmp-dir!)]
+    (fn middleware [next-handler]
+      (fn handler [fileset]
+        (let [include-files nil
+              local-files (map (juxt clojure.java.io/file identity) local-files)]
+          (println local-files)
+          (boot.util/info "Writing %s\n" output)
+          (with-open [zos (java.util.zip.ZipOutputStream. (java.io.FileOutputStream. (clojure.java.io/file tmp-out output)))]
+            (doseq [[file path] (concat include-files local-files)]
+              (.putNextEntry zos (java.util.zip.ZipEntry. path))
+              (clojure.java.io/copy file zos)
+              (.closeEntry zos))))
+        (-> fileset
+            (boot.core/add-resource tmp-out)
+            (boot.core/commit!)
+            next-handler)))))
 
 (deftask package
   "Build the package"
