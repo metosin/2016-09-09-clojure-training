@@ -23,6 +23,7 @@
 
                   [http-kit "2.2.0"]
                   [com.taoensso/sente "1.10.0"]
+                  [com.cognitect/transit-clj "0.8.288"]
                   [org.clojure/tools.namespace "0.3.0-alpha3"]
                   [reloaded.repl "0.2.3"]
                   [com.stuartsierra/component "0.3.1"]
@@ -35,6 +36,7 @@
                   ;; Latest snapshot fixes some important issues - use the specific version
                   [reagent "0.6.0-20160714.075816-3" :scope "provided"]
                   [example-component "0.1.0-SNAPSHOT" :scope "provided"]
+                  [com.cognitect/transit-cljs "0.8.239" :scope "provided"]
                   [binaryage/devtools "0.8.1" :scope "provided"]]
   :checkouts '[[example-component "0.1.0-SNAPSHOT"]])
 

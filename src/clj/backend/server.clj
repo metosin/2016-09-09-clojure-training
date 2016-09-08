@@ -1,6 +1,5 @@
 (ns backend.server
-  (:require [clojure.java.io :as io]
-            [com.stuartsierra.component :as component]
+  (:require [com.stuartsierra.component :as component]
             [compojure.core :refer [GET defroutes]]
             [compojure.route :refer [resources]]
             [ring.util.http-response :refer :all]
