@@ -23,6 +23,7 @@ demonstrate usage of Boot and Lein checkouts feature.
 - Cursive: Start repl from cursive or `lein repl` and connect to remote repl
 - Fireplace: `lein repl` and connect to remote repl
 - Cider: `M-x cider-jack-in` to start repl or `lein repl` and `M-x cider-connect`
+- Run `(go)` on the repl
 
 ## File tree
 

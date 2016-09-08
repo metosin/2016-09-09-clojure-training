@@ -38,7 +38,8 @@
 
   :cljsbuild {:builds [{:id "dev"
                         ;; only needs to include dir with the main file, others can be read from classpath
-                        :source-paths ["src/cljs"]
+                        ;; Figwheel needs checkout paths here for auto compilete (https://github.com/bhauman/lein-figwheel/issues/9)
+                        :source-paths ["src/cljs" "checkouts/example-component/src"]
                         :figwheel true
                         :compiler {:main "frontend.main"
                                    :asset-path "js/out"
