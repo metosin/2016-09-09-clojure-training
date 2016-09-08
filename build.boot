@@ -66,7 +66,8 @@
   (comp
     (watch)
     (less)
-    (reload)
+    ;; FIXME: Needlesly unintuitive
+    (reload :asset-path "/public")
     ; This starts a nrepl server with piggieback middleware
     (cljs-repl)
     (cljs)
