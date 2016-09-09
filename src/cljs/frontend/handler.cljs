@@ -17,11 +17,39 @@
     (js/console.log "Channel socket successfully established!")
     (js/console.log "Channel socket state change:" ?data)))
 
-(defmethod event-msg-handler :chsk/recv
-  [{:as ev-msg :keys [?data]}]
-  (js/console.log "Push event from server:" ?data))
-
 (defmethod event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]
   (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (js/console.log "Handshake:" ?data)))
+    (js/console.log "Handshake:" ?data)
+    (state/chsk-send! [:todos.query/list])))
+
+(defmethod event-msg-handler :chsk/recv
+  [{:as ev-msg :keys [?data]}]
+  (js/console.log "Push event from server:" ?data)
+  (if ?data
+    (event-msg-handler (assoc ev-msg
+                              :id (first ?data)
+                              :?data (second ?data)))))
+
+;;
+;; App logic
+;;
+
+(defmethod event-msg-handler :todos/added
+  [{:as ev-msg :keys [?data]}]
+  (let [{:keys [id]} ?data]
+    (swap! state/todos assoc id ?data)))
+
+(defmethod event-msg-handler :todos/update
+  [{:as ev-msg :keys [?data]}]
+  (let [{:keys [id]} ?data]
+    (swap! state/todos update id merge ?data)))
+
+(defmethod event-msg-handler :todos/removed
+  [{:as ev-msg :keys [?data]}]
+  (let [{:keys [id]} ?data]
+    (swap! state/todos dissoc id)))
+
+(defmethod event-msg-handler :todos/list
+  [{:as ev-msg :keys [?data]}]
+  (reset! state/todos (into {} (map (juxt :id identity) ?data))))

@@ -23,7 +23,7 @@ This is not the truth. These are some things we have learned and use.
 
 - JSON
 - EDN
-- Transit
+- Transit+json
 - HTTP vs. WebSocket
 - HANDS ON: Sente example - connect existing backend app and frontend
 

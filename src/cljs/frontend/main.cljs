@@ -8,32 +8,20 @@
 ;; Based on https://github.com/holmsand/reagent/blob/master/examples/todomvc/src/todomvc/core.cljs
 
 (defn add-todo [text]
-  (let [id (swap! state/counter inc)]
-    ; (chsk-send! [:todos/add {:title text :done false}])
-    (swap! state/todos assoc id {:id id :title text :done false})))
+  (state/chsk-send! [:todos.command/add {:title text :done false}]))
 
 (defn toggle [id]
-  ; (chsk-send! [:todos/toggle {:id id}])
-  (swap! state/todos update-in [id :done] not))
+  (state/chsk-send! [:todos.command/toggle {:id id}]))
 
 (defn save [id title]
-  ; (chsk-send! [:todos/save {:id id :title title}])
-  (swap! state/todos assoc-in [id :title] title))
+  (state/chsk-send! [:todos.command/save {:id id :title title}]))
 
 (defn delete [id]
-  ; (chsk-send! [:todos/delete {:id id}])
-  (swap! state/todos dissoc id))
+  (state/chsk-send! [:todos.command/delete {:id id}]))
 
 (defn mmap [m f a] (->> m (f a) (into (empty m))))
 (defn complete-all [v] (swap! state/todos mmap map #(assoc-in % [1 :done] v)))
 (defn clear-done [] (swap! state/todos mmap remove #(get-in % [1 :done])))
-
-(defonce init (do
-                (add-todo "Write CSS for this app")
-                (add-todo "Write Sente + Transit code")
-                (add-todo "Think about reusable Reagent component")
-                (add-todo "Write code for Boot Docker zip task")
-                (complete-all true)))
 
 (defn todo-input [{:keys [title on-save on-stop focus-on-mount]}]
   (let [val (r/atom title)
@@ -121,7 +109,6 @@
   (swap! router (fn [old]
                   (if old (old))
                   (sente/start-chsk-router! state/ch-chsk handler/event-msg-handler*)))
-  (state/chsk-send! [:todos/get-list])
   (r/render-component [todo-app] (js/document.getElementById "app")))
 
 ;; When this namespace is (re)loaded the Reagent app is mounted to DOM

@@ -37,7 +37,7 @@ Basic idea of Clojure build tools is to manage the classpath.
 - lein ring server ?
 - repl + manual reload using editor
 - repl + automatic reload using c.t.n or such
-- repl + component/mount etc.
+- **repl + component/mount etc.**
     - restartable
 - remote nrepl - to prod!!
 
@@ -119,6 +119,7 @@ Basic idea of Clojure build tools is to manage the classpath.
 ## Deploying a project
 
 - Uberjar?
+- SystemD service
 - Can get quite big if lots of dependencies
 - There are couple of large offender packages - like ring-middleware-format which requires ibm/icu4j
 - Make sure development deps are not included: Cljs compiler & Cljs libs

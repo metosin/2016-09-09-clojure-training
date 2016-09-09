@@ -1,6 +1,10 @@
 (ns backend.handler
   (:require [backend.state :as state]))
 
+(defn broadcast [ev-msg message]
+  (doseq [uid (:any @(:connected-uids ev-msg))]
+    ((:send-fn ev-msg) uid message)))
+
 (defmulti event-msg-handler :id)
 
 (defn event-msg-handler* [{:as ev-msg :keys [id ?data event]}]
@@ -15,13 +19,34 @@
     (when ?reply-fn
       (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
 
-(defmethod event-msg-handler :todos/add
-  [{:keys [?data send-fn ?reply-fn connected-uids]}]
-  (let [id (str (java.util.UUID/randomUUID))
+(defmethod event-msg-handler :todos.command/add
+  [{:as ev-msg :keys [?data]}]
+  (let [id (inc (if (seq @state/todos)
+                  (apply max (map :id (vals @state/todos)))
+                  0))
         data (assoc ?data :id id)]
-    ;; Broadcast
-    (doseq [uid (:any @connected-uids)]
-      (send-fn uid [:todos/added data]))
-    (when ?reply-fn
-      (?reply-fn [:todos/added data]))
-    (swap! state/todos assoc id data)))
+    (swap! state/todos assoc id data)
+    (broadcast ev-msg [:todos/added data])))
+
+(defmethod event-msg-handler :todos.command/toggle
+  [{:as ev-msg :keys [?data]}]
+  (let [{:keys [id]} ?data]
+    (swap! state/todos update-in [id :done] not)
+    (broadcast ev-msg [:todos/update (get @state/todos id)])))
+
+(defmethod event-msg-handler :todos.command/delete
+  [{:as ev-msg :keys [?data]}]
+  (let [{:keys [id]} ?data]
+    (swap! state/todos dissoc id)
+    (broadcast ev-msg [:todos/removed {:id id}])))
+
+(defmethod event-msg-handler :todos.command/save
+  [{:as ev-msg :keys [?data]}]
+  (let [{:keys [id]} ?data]
+    (swap! state/todos update id merge (dissoc ?data :id))
+    (broadcast ev-msg [:todos/update (get @state/todos id)])))
+
+(defmethod event-msg-handler :todos.query/list
+  [{:as ev-msg :keys [?data ?reply-fn]}]
+  (let [{:keys [id]} ?data]
+    (?reply-fn [:todos/list (vals @state/todos)])))
