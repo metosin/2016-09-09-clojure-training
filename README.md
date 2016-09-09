@@ -62,3 +62,5 @@ development some parts are included in classpath to serve files from
 - https://github.com/adzerk-oss/boot-cljs/issues/95
 - New boot-cljs release for compiler-options precedence change
 - Less4clj 1.9.0-alpha12 compat
+
+[]: vim: set nospell :
