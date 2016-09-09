@@ -29,29 +29,6 @@ Basic idea of Clojure build tools is to manage the classpath.
 - HANDS ON: Create a Boot task
     - Implement zip task which packages some files
 
-## Cljs build tooling
-
-### Figwheel
-
-- Live reload (JS, CSS...)
-- HUD - Displays e.g. Cljs warnings and errors
-- Built-in Cljs REPL
-- Multiple clients
-
-### Boot-cljs & co.
-
-- Provides most of the same feature as Figwheel
-- Three separate tasks: boot-cljs, boot-reload and boot-cljs-repl
-
-### Alternatives
-
-- Don't want Boot but Lein has too many processes - Fix it yourself:
-- Use Figwheel library from `lein repl` (or boot): https://github.com/bhauman/lein-figwheel#scripting-figwheel
-    - One JVM process less, has side-effects!
-- Similarly you could run Less4clj without Lein plugin
-- https://github.com/clojure/clojurescript/wiki/Quick-Start#auto-building
-- https://github.com/clojure/clojurescript/blob/master/src/main/clojure/cljs/build/api.clj
-
 ## Workflow
 
 ### Clojure
@@ -77,6 +54,29 @@ Basic idea of Clojure build tools is to manage the classpath.
 - Browser repl (Nrepl + Websocket)
 - (emacs) Inferior lisp mode repl
 - "David's workflow, maybe" Cljs.jar + bash build script + manual reload
+
+## Cljs build tooling
+
+### Figwheel
+
+- Live reload (JS, CSS...)
+- HUD - Displays e.g. Cljs warnings and errors
+- Built-in Cljs REPL
+- Multiple clients
+
+### Boot-cljs & co.
+
+- Provides most of the same feature as Figwheel
+- Three separate tasks: boot-cljs, boot-reload and boot-cljs-repl
+
+### Alternatives
+
+- Don't want Boot but Lein has too many processes - Fix it yourself:
+- Use Figwheel library from `lein repl` (or boot): https://github.com/bhauman/lein-figwheel#scripting-figwheel
+    - One JVM process less, has side-effects!
+- Similarly you could run Less4clj without Lein plugin
+- https://github.com/clojure/clojurescript/wiki/Quick-Start#auto-building
+- https://github.com/clojure/clojurescript/blob/master/src/main/clojure/cljs/build/api.clj
 
 ### Testing
 
@@ -108,6 +108,13 @@ Basic idea of Clojure build tools is to manage the classpath.
     - Library projects needs it's own development process to build the JAR file after changes
     - Easy with Boot: `boot watch pom jar install` (install a jar to local maven repo after everychange)
     - Slow with Lein
+
+## Initializing a project
+
+- Templates (`lein new`, `boot new`)
+- Example project
+- Copy the previous project
+- From scratch?
 
 ## Deploying a project
 
