@@ -26,6 +26,9 @@
 (defmethod event-msg-handler :chsk/recv
   [{:as ev-msg :keys [?data]}]
   (js/console.log "Push event from server:" ?data)
+  ;; For some reason all messages from server are handled by this method
+  ;; In this example messages are all in format [id data]
+  ;; This example calls this same multimethod again, with destructured message
   (if ?data
     (event-msg-handler (assoc ev-msg
                               :id (first ?data)
