@@ -1,74 +1,32 @@
 (ns frontend.main
-  (:require-macros [cljs.core.async.macros :as asyncm])
   (:require [reagent.core :as r]
-            [cljs.core.async :as async]
             [taoensso.sente :as sente]
-            [taoensso.sente.packers.transit :as sente-transit]
-            [example-component.core :refer [autocomplete]]))
+            [example-component.core :refer [autocomplete]]
+            [frontend.state :as state]
+            [frontend.handler :as handler]))
 
 ;; Based on https://github.com/holmsand/reagent/blob/master/examples/todomvc/src/todomvc/core.cljs
 
-(defonce todos (r/atom (sorted-map)))
-
-(defonce counter (r/atom 0))
-
-;; WEBSOCKETS
-
-(defmulti event-msg-handler :id) ; Dispatch on event-id
-
-(let [packer (sente-transit/get-transit-packer)
-      socket (sente/make-channel-socket! "/chsk" {:type :auto
-                                                  :packer packer})]
-  (def chsk (:chsk socket))
-  (def ch-chsk (:ch-recv socket))
-  (def chsk-send! (:send-fn socket))
-  (def chsk-state (:state socket)))
-
-(defn event-msg-handler* [{:as ev-msg :keys [id ?data event]}]
-  (js/console.log "Event:" event)
-  (event-msg-handler ev-msg))
-
-(defmethod event-msg-handler :default ; Fallback
-  [{:as ev-msg :keys [event]}]
-  (js/console.log "Unhandled event:" event))
-
-(defmethod event-msg-handler :chsk/state
-  [{:as ev-msg :keys [?data]}]
-  (if (= ?data {:first-open? true})
-    (js/console.log "Channel socket successfully established!")
-    (js/console.log "Channel socket state change:" ?data)))
-
-(defmethod event-msg-handler :chsk/recv
-  [{:as ev-msg :keys [?data]}]
-  (js/console.log "Push event from server:" ?data))
-
-(defmethod event-msg-handler :chsk/handshake
-  [{:as ev-msg :keys [?data]}]
-  (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (js/console.log "Handshake:" ?data)))
-
-;; ---
-
 (defn add-todo [text]
-  (let [id (swap! counter inc)]
-    (chsk-send! [:todos/add {:title text :done false}])
-    (swap! todos assoc id {:id id :title text :done false})))
+  (let [id (swap! state/counter inc)]
+    ; (chsk-send! [:todos/add {:title text :done false}])
+    (swap! state/todos assoc id {:id id :title text :done false})))
 
 (defn toggle [id]
-  (chsk-send! [:todos/toggle {:id id}])
-  (swap! todos update-in [id :done] not))
+  ; (chsk-send! [:todos/toggle {:id id}])
+  (swap! state/todos update-in [id :done] not))
 
 (defn save [id title]
-  (chsk-send! [:todos/save {:id id :title title}])
-  (swap! todos assoc-in [id :title] title))
+  ; (chsk-send! [:todos/save {:id id :title title}])
+  (swap! state/todos assoc-in [id :title] title))
 
 (defn delete [id]
-  (chsk-send! [:todos/delete {:id id}])
-  (swap! todos dissoc id))
+  ; (chsk-send! [:todos/delete {:id id}])
+  (swap! state/todos dissoc id))
 
 (defn mmap [m f a] (->> m (f a) (into (empty m))))
-(defn complete-all [v] (swap! todos mmap map #(assoc-in % [1 :done] v)))
-(defn clear-done [] (swap! todos mmap remove #(get-in % [1 :done])))
+(defn complete-all [v] (swap! state/todos mmap map #(assoc-in % [1 :done] v)))
+(defn clear-done [] (swap! state/todos mmap remove #(get-in % [1 :done])))
 
 (defonce init (do
                 (add-todo "Write CSS for this app")
@@ -127,7 +85,7 @@
 (defn todo-app [props]
   (let [filt (r/atom :all)]
     (fn []
-      (let [items (vals @todos)
+      (let [items (vals @state/todos)
             done (->> items (filter :done) count)
             active (- (count items) done)]
         [:div.todo-app
@@ -162,8 +120,8 @@
   (js/console.log "Starting the app")
   (swap! router (fn [old]
                   (if old (old))
-                  (sente/start-chsk-router! ch-chsk event-msg-handler*)))
-  (chsk-send! [:todos/get-list])
+                  (sente/start-chsk-router! state/ch-chsk handler/event-msg-handler*)))
+  (state/chsk-send! [:todos/get-list])
   (r/render-component [todo-app] (js/document.getElementById "app")))
 
 ;; When this namespace is (re)loaded the Reagent app is mounted to DOM

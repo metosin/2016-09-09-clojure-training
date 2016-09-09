@@ -37,10 +37,13 @@ This is not the truth. These are some things we have learned and use.
 - Pass only PURE DATA to the components!
 - No atoms, instead value & on-change callback etc.
 - Parametrize class of every element?
-- HANDS ON: Reagent, build x component
+- HANDS ON: Reagent, build autocomplete component
 
 # Random ideas worth mentioning
 
+- Re-frame
+- Routing
+- How to trigger queries to the backend
 - Performant Cljs code: https://github.com/funcool/bide write critical parts in JS
 
 []: vim: set nospell :
